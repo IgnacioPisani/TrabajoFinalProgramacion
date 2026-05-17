@@ -2,6 +2,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Public/ZombieGameMode.h"
 #include "Public/ZombiePlayerState.h"
 
@@ -11,6 +13,9 @@ class AZombiePlayerState;
 AZombieCharacter::AZombieCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
+    ZombieTrailFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ZombieTrailFX"));
+    ZombieTrailFX->SetupAttachment(RootComponent);
+    ZombieTrailFX->SetAutoActivate(false);  // empieza apagado
 }
 
 void AZombieCharacter::BeginPlay()
@@ -31,30 +36,31 @@ void AZombieCharacter::ApplyZombieVisuals(bool bIsZombie)
 {
     if (bIsZombie)
     {
-        if (ZombieMaterial) {
-            for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
-            {
-                if (ZombieMaterial)
-                    GetMesh()->SetMaterial(i, ZombieMaterial);
-            }
-        }
+        // Material
+        for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
+            if (ZombieMaterial)
+                GetMesh()->SetMaterial(i, ZombieMaterial);
+
+        // Activar estela
+        if (ZombieTrailFX)
+            ZombieTrailFX->Activate(true);
+
+        // Ragdoll y overlap — código existente
         GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
         GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-        GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-
         GetMesh()->SetAllBodiesBelowSimulatePhysics(FName("spine_01"), true, true);
-
         GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(
             this, &AZombieCharacter::OnCapsuleOverlap);
     }
     else
     {
-        if (SurvivorMaterial)
-            GetMesh()->SetMaterial(0, SurvivorMaterial);
+        // Desactivar estela si vuelve a ser survivor
+        if (ZombieTrailFX)
+            ZombieTrailFX->Deactivate();
 
+        // Resto del código existente
         GetMesh()->SetAllBodiesBelowSimulatePhysics(FName("spine_01"), false, true);
         GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
         GetCapsuleComponent()->OnComponentBeginOverlap.RemoveDynamic(
             this, &AZombieCharacter::OnCapsuleOverlap);
     }

@@ -23,7 +23,9 @@ void UZombieHUD::NativeConstruct()
 	if (txt_Conteo)
 		txt_Conteo->SetVisibility(ESlateVisibility::Hidden);
 	if (txt_Tiempo)
-		txt_Tiempo->SetVisibility(ESlateVisibility::Hidden);;
+		txt_Tiempo->SetVisibility(ESlateVisibility::Hidden);
+	if (txt_Countdown)
+		txt_Countdown->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UZombieHUD::FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunction<void()> OnComplete)
@@ -137,4 +139,23 @@ void UZombieHUD::ShowInfectedOverlay()
 			[this]() { FadeWidget(img_InfectedOverlay, false, 0.5f); },
 			2.f, false);
 	});
+}
+
+void UZombieHUD::ShowCountdown(int32 Number)
+{
+	if (!txt_Countdown) return;
+
+	// Si es 0 ocultás el texto
+	if (Number <= 0)
+	{
+		FadeWidget(txt_Countdown, false, 0.3f);
+		return;
+	}
+
+	FString Texto = FString::Printf(TEXT("%d"), Number);
+	txt_Countdown->SetText(FText::FromString(Texto));
+	txt_Countdown->SetVisibility(ESlateVisibility::Visible);
+
+	// Fade in rápido y fade out antes del siguiente número
+	FadeWidget(txt_Countdown, true, 0.2f);
 }

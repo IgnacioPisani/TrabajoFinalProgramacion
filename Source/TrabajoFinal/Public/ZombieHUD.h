@@ -15,10 +15,14 @@ public:
 	void UpdateCount(int32 Survivors, int32 Zombies);
 	void ShowRoleAlert(bool bIsZombie);
 	void ShowInfectedOverlay();
+	void ShowCountdown(int32 Number);
 
 protected:
 	virtual void NativeConstruct() override;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_Countdown = nullptr;
+	
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* txt_Tiempo = nullptr;
 
@@ -64,5 +68,5 @@ private:
 
 	FTimerHandle TimerHandle_FadeAlert;
 	FTimerHandle TimerHandle_FadeOverlay;
-
+	FTimerHandle TimerHandle_HideCountdown;
 };

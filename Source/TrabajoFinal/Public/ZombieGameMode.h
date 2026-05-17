@@ -20,6 +20,7 @@ public:
 	void CheckVictoryCondition();
 	void EndGame(bool bZombiesWon);
 	void RespawnPlayer(AController* Controller);
+	void StartCountdown();
 
 private:
 	TArray<APlayerController*> ConnectedPlayers;
@@ -35,4 +36,8 @@ private:
 	FTimerHandle TimerHandle_StartGame;
 	
 	FTimerHandle TimerHandle_Countdown;
+
+	int32 CountdownValue = 3;
+	
+	FTimerHandle TimerHandle_Countdown_Pre;  
 };

@@ -27,6 +27,9 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateCount(int32 Survivors, int32 Zombies);
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowCountdown(int32 Number);
 	
 protected:
 	virtual void BeginPlay() override;

@@ -50,6 +50,11 @@ protected:
 private:
 	FTimerHandle TimerHandle_Respawn;
 
+	UPROPERTY(VisibleAnywhere, Category = "FX")
+	class UNiagaraComponent* ZombieTrailFX = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	class UNiagaraSystem* ZombieTrailSystem = nullptr;
 };
     
 

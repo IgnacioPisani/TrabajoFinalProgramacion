@@ -12,6 +12,12 @@ void AZombiePlayerController::ClientUpdateCount_Implementation(int32 Survivors, 
 		HUDWidget->UpdateCount(Survivors, Zombies);
 }
 
+void AZombiePlayerController::ClientShowCountdown_Implementation(int32 Number)
+{
+	if (HUDWidget)
+		HUDWidget->ShowCountdown(Number);
+}
+
 void AZombiePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
