@@ -36,4 +36,5 @@ private:
 	
 	FTimerHandle TimerHandle_Countdown;
 
+	TArray<int32> UsedMaterialIndices;  // índices ya asignados
 };

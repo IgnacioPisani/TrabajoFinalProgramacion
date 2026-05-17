@@ -26,6 +26,24 @@ void AZombieCharacter::GetLifetimeReplicatedProps(
 }
 
 
+
+void AZombieCharacter::AssignMaterial(int32 Index)
+{
+    if (!HasAuthority()) return;
+    if (!PlayerMaterials.IsValidIndex(Index)) return;
+
+    NetMulticast_SetMaterial(Index);
+}
+
+void AZombieCharacter::NetMulticast_SetMaterial_Implementation(int32 Index)
+{
+    if (!PlayerMaterials.IsValidIndex(Index)) return;
+
+    // Aplicar el mismo material a todos los slots
+    for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
+        GetMesh()->SetMaterial(i, PlayerMaterials[Index]);
+}
+
 void AZombieCharacter::ApplyZombieVisuals(bool bIsZombie)
 {
     if (bIsZombie)

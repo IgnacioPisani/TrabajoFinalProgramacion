@@ -43,7 +43,20 @@ void AZombieGameMode::PostLogin(APlayerController* NewPlayer)
             break;
         }
     }
-
+    if (AZombieCharacter* ZC = Cast<AZombieCharacter>(NewPlayer->GetPawn()))
+    {
+        // Buscar índice no usado
+        for (int32 i = 0; i < ZC->PlayerMaterials.Num(); i++)
+        {
+            if (!UsedMaterialIndices.Contains(i))
+            {
+                UsedMaterialIndices.Add(i);
+                ZC->AssignMaterial(i);
+                break;
+            }
+        }
+    }
+    
     if (ConnectedPlayers.Num() >= MinPlayersToStart)
     {
         GetWorldTimerManager().SetTimer(
@@ -146,6 +159,7 @@ void AZombieGameMode::CheckVictoryCondition()
 void AZombieGameMode::EndGame(bool bZombiesWon)
 {
     GetWorldTimerManager().ClearTimer(TimerHandle_Countdown);
+    UsedMaterialIndices.Empty();  // <- agregar
     UsedSpawnPoints.Empty(); 
     if (AZombieGameState* GS = GetGameState<AZombieGameState>())
         GS->SetGamePhase(EGamePhase::GameOver);

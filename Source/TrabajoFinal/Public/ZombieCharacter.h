@@ -33,6 +33,13 @@ public:
 	void TakeDamageZombie(float DamageAmount);
 	void OnDeath();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
+	TArray<UMaterialInterface*> PlayerMaterials;
+
+	void AssignMaterial(int32 Index);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_SetMaterial(int32 Index);
 protected:
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -42,7 +49,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	UMaterialInterface* SurvivorMaterial = nullptr;
+
+	
 private:
 	FTimerHandle TimerHandle_Respawn;
 
 };
+    
+
