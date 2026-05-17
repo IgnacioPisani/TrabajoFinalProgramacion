@@ -35,6 +35,4 @@ private:
 	FTimerHandle TimerHandle_StartGame;
 	
 	FTimerHandle TimerHandle_Countdown;
-
-	TArray<int32> UsedMaterialIndices;  // índices ya asignados
 };
