@@ -145,7 +145,6 @@ void UZombieHUD::ShowCountdown(int32 Number)
 {
 	if (!txt_Countdown) return;
 
-	// Si es 0 ocultás el texto
 	if (Number <= 0)
 	{
 		FadeWidget(txt_Countdown, false, 0.3f);
@@ -156,6 +155,5 @@ void UZombieHUD::ShowCountdown(int32 Number)
 	txt_Countdown->SetText(FText::FromString(Texto));
 	txt_Countdown->SetVisibility(ESlateVisibility::Visible);
 
-	// Fade in rápido y fade out antes del siguiente número
 	FadeWidget(txt_Countdown, true, 0.2f);
 }

@@ -170,7 +170,6 @@ void AZombieGameMode::StartCountdown()
 {
     CountdownValue = 3;
 
-    // Notificar a todos el número inicial
     for (APlayerController* PC : ConnectedPlayers)
         if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
             ZPC->ClientShowCountdown(CountdownValue);
@@ -181,17 +180,15 @@ void AZombieGameMode::StartCountdown()
         {
             CountdownValue--;
 
-            // Enviar número a todos los clientes
             for (APlayerController* PC : ConnectedPlayers)
                 if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
                     ZPC->ClientShowCountdown(CountdownValue);
 
-            // Cuando llega a 0 arranca el juego
             if (CountdownValue <= 0)
             {
                 GetWorldTimerManager().ClearTimer(TimerHandle_Countdown_Pre);
                 StartInfection();
             }
         },
-        1.f, true);  // cada 1 segundo
+        1.f, true); 
 }

@@ -38,8 +38,6 @@ void AZombiePlayerState::OnRep_IsZombie()
 		ZPC->ClientShowRole(bIsZombie);
 	}
 
-    UE_LOG(LogTemp, Warning, TEXT("Player %s is now: %s"),
-        *GetPlayerName(), bIsZombie ? TEXT("ZOMBIE") : TEXT("SURVIVOR"));
 }
 
 void AZombiePlayerState::AddScore(float Amount)
