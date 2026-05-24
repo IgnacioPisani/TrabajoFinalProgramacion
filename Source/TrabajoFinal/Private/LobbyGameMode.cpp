@@ -5,31 +5,47 @@ ALobbyGameMode::ALobbyGameMode()
 {
     bUseSeamlessTravel = true;  // viaje sin pantalla de carga abrupta
 }
+#include "Engine/TargetPoint.h"
+#include "EngineUtils.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     LobbyPlayers.Add(NewPlayer);
 
-    // Delay para que el widget exista antes de actualizarlo
+    // Asignar slot — host toma el centroint32 SlotOrder[] = {1, 0, 2, 3};
+    SlotOrder = {1, 0, 2, 3};
+    int32 AssignedSlot = SlotOrder[FMath::Min(LobbyPlayers.Num() - 1, 3)];
     FTimerHandle TimerHandle_UpdateCount;
     GetWorldTimerManager().SetTimer(
         TimerHandle_UpdateCount,
-        [this]()
+        [this, NewPlayer, AssignedSlot]()
         {
-            // Notificar a todos cuántos jugadores hay
+            // Teleportar al Target Point correspondiente
+            if (APawn* Pawn = NewPlayer->GetPawn())
+            {
+                // Buscar el TP por nombre
+                FString TargetName = FString::Printf(TEXT("TP_Slot%d"), AssignedSlot);
+                for (TActorIterator<ATargetPoint> It(GetWorld()); It; ++It)
+                {
+                     if (It->GetActorLabel().Contains(TargetName))  
+                    {
+                        Pawn->SetActorLocationAndRotation(
+                            It->GetActorLocation(),
+                            It->GetActorRotation()
+                        );
+                        NewPlayer->SetControlRotation(It->GetActorRotation());
+                    }
+                    UE_LOG(LogTemp, Warning, TEXT("TargetPoint encontrado: %s"), *It->GetActorLabel());
+                }
+            }
+
+            // Notificar conteo a todos
             for (APlayerController* PC : LobbyPlayers)
             {
                 if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
                     LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
-            }
-
-            // Avisar al host si ya puede iniciar
-            if (LobbyPlayers.Num() >= MinPlayersToStart)
-            {
-                if (ALobbyPlayerController* HostPC = Cast<ALobbyPlayerController>(LobbyPlayers[0]))
-                {
-                    HostPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
-                }
             }
         },
         0.3f, false);

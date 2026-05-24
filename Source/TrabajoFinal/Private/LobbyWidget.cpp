@@ -46,14 +46,14 @@ void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Required)
 {
 	if (txt_Count)
 	{
-		FString Texto = FString::Printf(TEXT("Jugadores: %d/%d"), Current, Required);
+		FString Texto = FString::Printf(TEXT("JUGADORES: %d/%d"), Current, Required);
 		txt_Count->SetText(FText::FromString(Texto));
 	}
 
 	if (txt_Status)
 	{
 		FString Status = Current >= Required
-			? TEXT("Listo para iniciar!")
+			? TEXT("LISTO PARA INICIAR!")
 			: TEXT("Esperando jugadores...");
 		txt_Status->SetText(FText::FromString(Status));
 	}

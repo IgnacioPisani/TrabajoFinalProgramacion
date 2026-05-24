@@ -1,7 +1,10 @@
 #include "LobbyPlayerController.h"
+
+#include "EngineUtils.h"
 #include "LobbyGameMode.h"
 #include "LobbyWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Camera/CameraActor.h"
 
 
 void ALobbyPlayerController::BeginPlay()
@@ -19,9 +22,22 @@ void ALobbyPlayerController::BeginPlay()
 		}
 	}
 
-	// Habilitar cursor y modo UI+juego para poder clickear y moverse
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeGameAndUI());  // permite moverse Y clickear UI
+	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
+	{
+		SetViewTargetWithBlend(*It, 0.5f);
+		break;
+	}
+	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
+	{
+		if (It->GetActorLabel() == TEXT("LobbyCamera"))
+		{
+			SetViewTargetWithBlend(*It, 0.5f);
+			break;
+		}
+	}
+	bAutoManageActiveCameraTarget = false;
 }
 
 void ALobbyPlayerController::ServerSetReady_Implementation()
