@@ -32,6 +32,7 @@ public:
 	int32 SelectedMaterialIndex = 0;
 protected:
 	virtual void BeginPlay() override;
+	void ClientSetLobbyCamera_Implementation(int32 SlotIndex);
 
 private:
 	UPROPERTY()

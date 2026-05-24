@@ -70,37 +70,34 @@ void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bAutoManageActiveCameraTarget = false;  // <- primero esto
+
 	if (IsLocalController() && LobbyWidgetClass)
 	{
 		LobbyHUD = CreateWidget<ULobbyWidget>(this, LobbyWidgetClass);
 		if (LobbyHUD)
 		{
 			LobbyHUD->AddToViewport();
-		    bIsHost = (GetWorld()->GetFirstPlayerController() == this);
+			bIsHost = (GetWorld()->GetFirstPlayerController() == this);
 			int32 Required = 4;
 			if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
-				Required = GM->MaxPlayers;  
-
+				Required = GM->MaxPlayers;
 			LobbyHUD->UpdatePlayerCount(1, Required);
 		}
 	}
 
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeGameAndUI());
+
+	// Solo el loop con tag — borrar el otro
 	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
 	{
-		SetViewTargetWithBlend(*It, 0.5f);
-		break;
-	}
-	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
-	{
-		if (It->GetActorLabel() == TEXT("LobbyCamera"))
+		if (It->ActorHasTag(FName("LobbyCamera")))
 		{
 			SetViewTargetWithBlend(*It, 0.5f);
 			break;
 		}
 	}
-	bAutoManageActiveCameraTarget = false;
 }
 
 void ALobbyPlayerController::ServerSetReady_Implementation()
@@ -115,4 +112,16 @@ void ALobbyPlayerController::ClientUpdateReadyCount_Implementation(int32 Ready, 
 		LobbyHUD->UpdateReadyCount(Ready, Total);
 }
 
+void ALobbyPlayerController::ClientSetLobbyCamera_Implementation(int32 SlotIndex)
+{
+	FString CamTag = FString::Printf(TEXT("Cam_Slot%d"), SlotIndex);
 
+	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
+	{
+		if (It->ActorHasTag(FName(*CamTag)))  // <- reemplazar GetActorLabel
+		{
+			SetViewTargetWithBlend(*It, 0.5f);
+			break;
+		}
+	}
+}
