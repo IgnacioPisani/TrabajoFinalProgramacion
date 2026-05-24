@@ -9,7 +9,7 @@ class TRABAJOFINAL_API ULobbyWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void UpdatePlayerCount(int32 Current, int32 Required);
+void UpdatePlayerCount(int32 Current, int32 Max, int32 Min = 2);
 	void UpdateReadyCount(int32 Ready, int32 Total);
 
 protected:
@@ -26,7 +26,29 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* txt_Ready = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* btn_Color0 = nullptr;  
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* btn_Color1 = nullptr;  
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* btn_Color2 = nullptr;  
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* btn_Color3 = nullptr;  
 private:
+	UFUNCTION()
+	void OnColor0Clicked();
+	UFUNCTION()
+	void OnColor1Clicked();
+	UFUNCTION()
+	void OnColor2Clicked();
+	UFUNCTION()
+	void OnColor3Clicked();
+
+	void RequestColorChange(int32 ColorIndex);
 	
 	UFUNCTION()
 	void OnReadyClicked();

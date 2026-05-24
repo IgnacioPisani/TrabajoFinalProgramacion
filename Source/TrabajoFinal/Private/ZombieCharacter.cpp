@@ -97,6 +97,20 @@ void AZombieCharacter::ServerInfectPlayer_Implementation(AZombieCharacter* Victi
     }
 }
 
+void AZombieCharacter::AssignMaterial(int32 Index)
+{
+    if (!HasAuthority()) return;
+    if (!PlayerMaterials.IsValidIndex(Index)) return;
+    NetMulticast_SetMaterial(Index);
+}
+
+void AZombieCharacter::NetMulticast_SetMaterial_Implementation(int32 Index)
+{
+    if (!PlayerMaterials.IsValidIndex(Index)) return;
+
+    for (int32 i = 0; i < GetMesh()->GetNumMaterials(); i++)
+        GetMesh()->SetMaterial(i, PlayerMaterials[Index]);
+}
 
 void AZombieCharacter::NetMulticast_OnInfected_Implementation()
 {

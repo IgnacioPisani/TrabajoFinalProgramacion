@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "LobbyGameMode.h"
 #include "LobbyWidget.h"
+#include "ZombieCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraActor.h"
 #include "GameFramework/Character.h"
@@ -36,6 +37,19 @@ void ALobbyPlayerController::ClientForceRotation_Implementation(FRotator NewRota
 		},
 		0.5f, false);
 }
+
+void ALobbyPlayerController::ClientUpdateLobbyCount_Implementation(int32 Current, int32 Max, int32 Min)
+{
+	if (LobbyHUD)
+		LobbyHUD->UpdatePlayerCount(Current, Max, Min);
+}
+
+void ALobbyPlayerController::ServerChangeColor_Implementation(int32 ColorIndex)
+{
+	if (AZombieCharacter* ZC = Cast<AZombieCharacter>(GetPawn()))
+		ZC->AssignMaterial(ColorIndex);
+}
+
 void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -47,12 +61,16 @@ void ALobbyPlayerController::BeginPlay()
 		{
 			LobbyHUD->AddToViewport();
 		    bIsHost = (GetWorld()->GetFirstPlayerController() == this);
-			LobbyHUD->UpdatePlayerCount(1, 2);
+			int32 Required = 4;
+			if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
+				Required = GM->MaxPlayers;  
+
+			LobbyHUD->UpdatePlayerCount(1, Required);
 		}
 	}
 
 	bShowMouseCursor = true;
-	SetInputMode(FInputModeGameAndUI());  // permite moverse Y clickear UI
+	SetInputMode(FInputModeGameAndUI());
 	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
 	{
 		SetViewTargetWithBlend(*It, 0.5f);
@@ -81,13 +99,4 @@ void ALobbyPlayerController::ClientUpdateReadyCount_Implementation(int32 Ready, 
 		LobbyHUD->UpdateReadyCount(Ready, Total);
 }
 
-
-void ALobbyPlayerController::ClientUpdateLobbyCount_Implementation(int32 Current, int32 Required)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ClientUpdateLobbyCount: %d/%d"), Current, Required);
-	if (LobbyHUD)
-		LobbyHUD->UpdatePlayerCount(Current, Required);
-	else
-		UE_LOG(LogTemp, Warning, TEXT("LobbyHUD es NULL"));
-}
 

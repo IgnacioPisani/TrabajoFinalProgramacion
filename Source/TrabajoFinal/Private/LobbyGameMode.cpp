@@ -66,7 +66,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
       for (APlayerController* PC : LobbyPlayers)
       {
           if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
-              LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
+LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MaxPlayers, MinPlayersToStart);
       }
   },
   0.3f, false);
@@ -86,7 +86,7 @@ void ALobbyGameMode::Logout(AController* Exiting)
     {
         if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
         {
-            LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
+            LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MaxPlayers, MinPlayersToStart);
             LPC->ClientUpdateReadyCount(ReadyPlayers.Num(), LobbyPlayers.Num());
         }
     }
@@ -108,7 +108,7 @@ void ALobbyGameMode::SetPlayerReady(APlayerController* Player)
 
     // Si todos están listos → iniciar directamente, sin botón
     if (ReadyPlayers.Num() >= LobbyPlayers.Num() && LobbyPlayers.Num() >= MinPlayersToStart)
-        StartGame();  // <- directo, sin pasar por el host
+        StartGame();
 }
 
 void ALobbyGameMode::StartGame()

@@ -37,8 +37,12 @@ public:
 private:
 	TArray<APlayerController*> LobbyPlayers;
 
+public:
 	UPROPERTY(EditDefaultsOnly, Category = "Game")
 	int32 MinPlayersToStart = 2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Game")
+	int32 MaxPlayers = 4;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game")
 	FString GameMapPath = "/Game/Maps/Lvl_ThirdPerson";
