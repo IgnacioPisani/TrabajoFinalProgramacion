@@ -19,8 +19,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientShowRole(bool bIsZombie);
 
-	UFUNCTION(Client, Reliable)
-	void ClientGameOver(bool bZombiesWon);
 
 	UFUNCTION(Client, Unreliable)
 	void ClientUpdateTimer(float TimeRemaining);
@@ -33,6 +31,9 @@ public:
 	
 	UFUNCTION(Client, Reliable)
     void ClientForceRotation(FRotator NewRotation);
+
+	UFUNCTION(Client, Reliable)
+	void ClientGameOver(bool bZombiesWon, bool bIsHost);
 	
 protected:
 	virtual void BeginPlay() override;

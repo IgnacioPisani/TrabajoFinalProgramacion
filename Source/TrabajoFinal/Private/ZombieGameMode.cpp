@@ -66,6 +66,24 @@ void AZombieGameMode::BeginPlay()
         GS->SetGamePhase(EGamePhase::Waiting);
 }
 
+void AZombieGameMode::EndGame(bool bZombiesWon)
+{
+    GetWorldTimerManager().ClearTimer(TimerHandle_Countdown);
+
+    if (AZombieGameState* GS = GetGameState<AZombieGameState>())
+        GS->SetGamePhase(EGamePhase::GameOver);
+
+    for (int32 i = 0; i < ConnectedPlayers.Num(); i++)
+    {
+        if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(ConnectedPlayers[i]))
+        {
+            // El host es siempre el índice 0
+            bool bIsHost = (i == 0);
+            ZPC->ClientGameOver(bZombiesWon, bIsHost);  // <- agregar bIsHost
+        }
+    }
+}
+
 void AZombieGameMode::ReturnToLobby()
 {
     // Resetear estado de todos los jugadores
@@ -158,19 +176,7 @@ void AZombieGameMode::CheckVictoryCondition()
         EndGame(true);
 }
 
-void AZombieGameMode::EndGame(bool bZombiesWon)
-{
-    GetWorldTimerManager().ClearTimer(TimerHandle_Countdown);
-    UsedSpawnPoints.Empty(); 
-    if (AZombieGameState* GS = GetGameState<AZombieGameState>())
-        GS->SetGamePhase(EGamePhase::GameOver);
 
-    for (APlayerController* PC : ConnectedPlayers)
-    {
-        if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
-            ZPC->ClientGameOver(bZombiesWon);
-    }
-}
 
 void AZombieGameMode::RespawnPlayer(AController* Controller)
 {

@@ -43,7 +43,9 @@ void AZombiePlayerController::ClientForceRotation_Implementation(FRotator NewRot
 		0.3f, false);
 }
 
-void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon)
+
+
+void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon, bool bIsHost)
 {
 	SetPause(true);
 
@@ -60,11 +62,7 @@ void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon)
 				Score = PS->GetScore();
 
 			GameOverWidget->SetupResult(bZombiesWon, Score);
-
-			// Solo el host ve el botón
-			bool bIsHost = (GetWorld()->GetFirstPlayerController() == this);
-			GameOverWidget->SetIsHost(bIsHost);
-
+			GameOverWidget->SetIsHost(bIsHost);  // viene del servidor
 			GameOverWidget->AddToViewport();
 		}
 	}
@@ -76,7 +74,8 @@ void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon)
 void AZombiePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
+	SetInputMode(FInputModeGameOnly());
+	bShowMouseCursor = false;
 	if (IsLocalController() && HUDWidgetClass)
 	{
 		HUDWidget = CreateWidget<UZombieHUD>(this, HUDWidgetClass);
