@@ -1,10 +1,12 @@
 #include "LobbyGameMode.h"
 #include "LobbyPlayerController.h"
+#include "ZombiePlayerState.h"
 #include "GameFramework/Character.h"
 
 ALobbyGameMode::ALobbyGameMode()
 {
     bUseSeamlessTravel = true;  // viaje sin pantalla de carga abrupta
+    PlayerStateClass = AZombiePlayerState::StaticClass();  // <- agregar
 }
 #include "Engine/TargetPoint.h"
 #include "EngineUtils.h"

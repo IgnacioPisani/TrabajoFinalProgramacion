@@ -38,6 +38,8 @@ public:
 
 	void AssignMaterial(int32 Index);
 
+	virtual void OnRep_PlayerState() override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_SetMaterial(int32 Index);
 protected:

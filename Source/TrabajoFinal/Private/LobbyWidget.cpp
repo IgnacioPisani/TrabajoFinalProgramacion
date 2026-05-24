@@ -92,6 +92,9 @@ void ULobbyWidget::OnColor3Clicked() { RequestColorChange(3); }
 
 void ULobbyWidget::RequestColorChange(int32 ColorIndex)
 {
+	UE_LOG(LogTemp, Warning, TEXT("RequestColorChange: %d"), ColorIndex);
 	if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(GetOwningPlayer()))
 		PC->ServerChangeColor(ColorIndex);
+	else
+		UE_LOG(LogTemp, Warning, TEXT("PlayerController NULL en RequestColorChange"));
 }

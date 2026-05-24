@@ -4,9 +4,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "ZombieGameInstance.h"
 #include "Public/ZombieGameMode.h"
 #include "Public/ZombiePlayerState.h"
 
+class UZombieGameInstance;
 class AZombieGameMode;
 class AZombiePlayerState;
 
@@ -21,8 +23,44 @@ AZombieCharacter::AZombieCharacter()
 void AZombieCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (HasAuthority())
+    {
+        FTimerHandle TimerHandle_Mat;
+        GetWorldTimerManager().SetTimer(
+            TimerHandle_Mat,
+            [this]()
+            {
+                if (APlayerController* PC = Cast<APlayerController>(GetController()))
+                {
+                    if (UZombieGameInstance* GI = PC->GetGameInstance<UZombieGameInstance>())
+                    {
+                        FString PlayerName = PC->PlayerState 
+                            ? PC->PlayerState->GetPlayerName() 
+                            : TEXT("Unknown");
+                        int32 Index = GI->GetPlayerMaterial(PlayerName);
+                        UE_LOG(LogTemp, Warning, TEXT("BeginPlay - %s: material %d"), *PlayerName, Index);
+                        AssignMaterial(Index);
+                    }
+                }
+            },
+            0.5f, false);
+    }
 }
 
+void AZombieCharacter::OnRep_PlayerState()
+{
+    Super::OnRep_PlayerState();
+
+    AZombiePlayerState* PS = GetPlayerState<AZombiePlayerState>();
+    UE_LOG(LogTemp, Warning, TEXT("OnRep_PlayerState - %s"), *GetName());
+    UE_LOG(LogTemp, Warning, TEXT("PlayerState: %s"), PS ? TEXT("OK") : TEXT("NULL"));
+    if (PS)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("SelectedMaterialIndex: %d"), PS->SelectedMaterialIndex);
+        UE_LOG(LogTemp, Warning, TEXT("PlayerMaterials num: %d"), PlayerMaterials.Num());
+    }
+}
 void AZombieCharacter::GetLifetimeReplicatedProps(
     TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -103,6 +141,8 @@ void AZombieCharacter::AssignMaterial(int32 Index)
     if (!PlayerMaterials.IsValidIndex(Index)) return;
     NetMulticast_SetMaterial(Index);
 }
+
+
 
 void AZombieCharacter::NetMulticast_SetMaterial_Implementation(int32 Index)
 {

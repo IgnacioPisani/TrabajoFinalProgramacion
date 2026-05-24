@@ -28,6 +28,8 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerChangeColor(int32 ColorIndex);
+
+	int32 SelectedMaterialIndex = 0;
 protected:
 	virtual void BeginPlay() override;
 

@@ -4,10 +4,15 @@
 #include "LobbyGameMode.h"
 #include "LobbyWidget.h"
 #include "ZombieCharacter.h"
+#include "ZombieGameInstance.h"
+#include "ZombiePlayerState.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraActor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+
+class UZombieGameInstance;
+class AZombiePlayerState;
 
 void ALobbyPlayerController::ClientForceRotation_Implementation(FRotator NewRotation)
 {
@@ -46,8 +51,19 @@ void ALobbyPlayerController::ClientUpdateLobbyCount_Implementation(int32 Current
 
 void ALobbyPlayerController::ServerChangeColor_Implementation(int32 ColorIndex)
 {
-	if (AZombieCharacter* ZC = Cast<AZombieCharacter>(GetPawn()))
-		ZC->AssignMaterial(ColorIndex);
+	if (UZombieGameInstance* GI = GetGameInstance<UZombieGameInstance>())
+	{
+		FString PlayerName = PlayerState ? PlayerState->GetPlayerName() : TEXT("Unknown");
+		GI->SetPlayerMaterial(PlayerName, ColorIndex);
+		UE_LOG(LogTemp, Warning, TEXT("GI guardado - %s: %d"), *PlayerName, ColorIndex);
+	}
+
+	if (AZombiePlayerState* PS = GetPlayerState<AZombiePlayerState>())
+		PS->SetSelectedMaterial(ColorIndex);
+
+	if (APawn* MyPawn = GetPawn())
+		if (AZombieCharacter* ZC = Cast<AZombieCharacter>(MyPawn))
+			ZC->AssignMaterial(ColorIndex);
 }
 
 void ALobbyPlayerController::BeginPlay()
