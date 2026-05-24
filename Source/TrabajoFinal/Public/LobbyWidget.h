@@ -10,8 +10,7 @@ class TRABAJOFINAL_API ULobbyWidget : public UUserWidget
 
 public:
 	void UpdatePlayerCount(int32 Current, int32 Required);
-	void SetStartButtonEnabled(bool bEnabled);
-	void SetHostMode(bool bIsHost);
+	void UpdateReadyCount(int32 Ready, int32 Total);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -23,9 +22,14 @@ protected:
 	class UTextBlock* txt_Status = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Start = nullptr;
+	class UButton* btn_Ready = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* txt_Ready = nullptr;
 private:
+	
 	UFUNCTION()
-	void OnStartClicked();
+	void OnReadyClicked();
+
+	bool bIsReady = false;
 };

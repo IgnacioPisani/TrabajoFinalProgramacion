@@ -6,17 +6,40 @@
 void ULobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+	
 
-	// Bindear botón
-	if (btn_Start)
-	{
-		btn_Start->OnClicked.AddDynamic(this, &ULobbyWidget::OnStartClicked);
-		btn_Start->SetIsEnabled(false);  // deshabilitado hasta que haya suficientes
-		btn_Start->SetVisibility(ESlateVisibility::Hidden);  // oculto hasta que sea host
-	}
+	// Bindear botón listo
+	if (btn_Ready)
+		btn_Ready->OnClicked.AddDynamic(this, &ULobbyWidget::OnReadyClicked);
 
 	if (txt_Status)
 		txt_Status->SetText(FText::FromString(TEXT("Esperando jugadores...")));
+}
+
+void ULobbyWidget::UpdateReadyCount(int32 Ready, int32 Total)
+{
+	if (txt_Ready)
+	{
+		FString Texto = FString::Printf(TEXT("Listos: %d/%d"), Ready, Total);
+		txt_Ready->SetText(FText::FromString(Texto));
+	}
+}
+
+void ULobbyWidget::OnReadyClicked()
+{
+	if (bIsReady) return;  // no puede des-listarse
+	bIsReady = true;
+
+	// Cambiar visual del botón para mostrar que está listo
+	if (btn_Ready)
+	{
+		btn_Ready->SetIsEnabled(false);
+		if (UTextBlock* BtnText = Cast<UTextBlock>(btn_Ready->GetChildAt(0)))
+			BtnText->SetText(FText::FromString(TEXT("LISTO!")));
+	}
+
+	if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(GetOwningPlayer()))
+		PC->ServerSetReady();
 }
 
 void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Required)
@@ -34,27 +57,4 @@ void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Required)
 			: TEXT("Esperando jugadores...");
 		txt_Status->SetText(FText::FromString(Status));
 	}
-}
-
-void ULobbyWidget::SetStartButtonEnabled(bool bEnabled)
-{
-	if (btn_Start)
-		btn_Start->SetIsEnabled(bEnabled);
-}
-
-void ULobbyWidget::SetHostMode(bool bIsHost)
-{
-	if (btn_Start)
-	{
-		// Solo el host ve el botón
-		btn_Start->SetVisibility(bIsHost
-			? ESlateVisibility::Visible
-			: ESlateVisibility::Hidden);
-	}
-}
-
-void ULobbyWidget::OnStartClicked()
-{
-	if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(GetOwningPlayer()))
-		PC->ServerRequestStartGame();
 }

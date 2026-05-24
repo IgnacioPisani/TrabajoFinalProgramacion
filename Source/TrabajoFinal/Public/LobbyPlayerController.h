@@ -9,17 +9,18 @@ class TRABAJOFINAL_API ALobbyPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	// Server RPC — solo el host puede iniciar
-	UFUNCTION(Server, Reliable)
-	void ServerRequestStartGame();
 
 	// Client RPCs
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateLobbyCount(int32 Current, int32 Required);
 
-	UFUNCTION(Client, Reliable)
-	void ClientEnableStartButton(bool bEnabled);
+	// Server RPC — jugador avisa que está listo
+	UFUNCTION(Server, Reliable)
+	void ServerSetReady();
 
+	// Client RPC — actualizar conteo de listos
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateReadyCount(int32 Ready, int32 Total);
 protected:
 	virtual void BeginPlay() override;
 

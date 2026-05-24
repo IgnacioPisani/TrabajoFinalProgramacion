@@ -3,6 +3,7 @@
 #include "LobbyWidget.h"
 #include "Blueprint/UserWidget.h"
 
+
 void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -10,32 +11,38 @@ void ALobbyPlayerController::BeginPlay()
 	if (IsLocalController() && LobbyWidgetClass)
 	{
 		LobbyHUD = CreateWidget<ULobbyWidget>(this, LobbyWidgetClass);
-		if (LobbyHUD) LobbyHUD->AddToViewport();
+		if (LobbyHUD)
+		{
+			LobbyHUD->AddToViewport();
+		    bIsHost = (GetWorld()->GetFirstPlayerController() == this);
+			LobbyHUD->UpdatePlayerCount(1, 2);
+		}
 	}
 
-	// El primer jugador es el host
-	bIsHost = (GetWorld()->GetFirstPlayerController() == this);
+	// Habilitar cursor y modo UI+juego para poder clickear y moverse
+	bShowMouseCursor = true;
+	SetInputMode(FInputModeGameAndUI());  // permite moverse Y clickear UI
 }
 
-void ALobbyPlayerController::ServerRequestStartGame_Implementation()
+void ALobbyPlayerController::ServerSetReady_Implementation()
 {
-	// Solo el host puede iniciar — verificamos en el servidor
-	if (GetWorld()->GetFirstPlayerController() == this)
-	{
-		if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
-			GM->StartGame();
-	}
+	if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
+		GM->SetPlayerReady(this);
 }
+
+void ALobbyPlayerController::ClientUpdateReadyCount_Implementation(int32 Ready, int32 Total)
+{
+	if (LobbyHUD)
+		LobbyHUD->UpdateReadyCount(Ready, Total);
+}
+
 
 void ALobbyPlayerController::ClientUpdateLobbyCount_Implementation(int32 Current, int32 Required)
 {
-	// Actualizar el widget con el conteo
-	// Conectás con WBP_Lobby después
-	UE_LOG(LogTemp, Warning, TEXT("Jugadores: %d/%d"), Current, Required);
+	UE_LOG(LogTemp, Warning, TEXT("ClientUpdateLobbyCount: %d/%d"), Current, Required);
+	if (LobbyHUD)
+		LobbyHUD->UpdatePlayerCount(Current, Required);
+	else
+		UE_LOG(LogTemp, Warning, TEXT("LobbyHUD es NULL"));
 }
 
-void ALobbyPlayerController::ClientEnableStartButton_Implementation(bool bEnabled)
-{
-	// Habilitar o deshabilitar el botón de inicio en el widget
-	UE_LOG(LogTemp, Warning, TEXT("Boton inicio: %s"), bEnabled ? TEXT("ON") : TEXT("OFF"));
-}
