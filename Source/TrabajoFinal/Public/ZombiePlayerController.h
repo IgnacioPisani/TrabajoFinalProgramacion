@@ -31,6 +31,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientShowCountdown(int32 Number);
 	
+	UFUNCTION(Client, Reliable)
+    void ClientForceRotation(FRotator NewRotation);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;

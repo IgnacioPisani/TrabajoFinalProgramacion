@@ -45,22 +45,34 @@ void UZombieHUD::FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunc
 	TSharedPtr<int32> CurrentStep = MakeShared<int32>(0);
 	TSharedPtr<FTimerHandle> Handle = MakeShared<FTimerHandle>();
 
+	// Usar TWeakObjectPtr para verificar si el widget sigue vivo
+	TWeakObjectPtr<UWidget> WeakWidget(Widget);
+	TWeakObjectPtr<UZombieHUD> WeakThis(this);
+
 	GetWorld()->GetTimerManager().SetTimer(
 		*Handle,
-		[this, Widget, CurrentStep, Steps, StartAlpha, AlphaStep, EndAlpha, Handle, OnComplete, bFadeIn]()
+		[WeakThis, WeakWidget, CurrentStep, Steps, StartAlpha, AlphaStep, EndAlpha, Handle, OnComplete, bFadeIn]()
 		{
+			// Verificar que tanto el HUD como el widget siguen vivos
+			if (!WeakThis.IsValid() || !WeakWidget.IsValid())
+			{
+				return;  // el widget fue destruido, salimos sin crashear
+			}
+
 			(*CurrentStep)++;
 			float NewAlpha = StartAlpha + AlphaStep * (*CurrentStep);
 			NewAlpha = FMath::Clamp(NewAlpha, 0.f, 1.f);
-			Widget->SetRenderOpacity(NewAlpha);
+			WeakWidget->SetRenderOpacity(NewAlpha);
 
 			if (*CurrentStep >= Steps)
 			{
-				GetWorld()->GetTimerManager().ClearTimer(*Handle);
-				Widget->SetRenderOpacity(EndAlpha);
+				if (WeakThis.IsValid())
+					WeakThis->GetWorld()->GetTimerManager().ClearTimer(*Handle);
+                
+				WeakWidget->SetRenderOpacity(EndAlpha);
 
 				if (!bFadeIn)
-					Widget->SetVisibility(ESlateVisibility::Hidden);
+					WeakWidget->SetVisibility(ESlateVisibility::Hidden);
 
 				if (OnComplete)
 					OnComplete();

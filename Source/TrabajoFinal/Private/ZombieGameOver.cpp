@@ -1,9 +1,13 @@
 // ZombieGameOver.cpp
 #include "Public/ZombieGameOver.h"
+
+#include "ZombieGameMode.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Kismet/GameplayStatics.h"
+
+class AZombieGameMode;
 
 void UZombieGameOver::NativeConstruct()
 {
@@ -31,9 +35,30 @@ void UZombieGameOver::SetupResult(bool bZombiesWon, float Score)
 	}
 }
 
+
+
 void UZombieGameOver::OnVolverClicked()
 {
+	if (!bIsHost) return;
+
 	if (APlayerController* PC = GetOwningPlayer())
+	{
 		PC->SetPause(false);
-	UGameplayStatics::OpenLevel(this, FName("MainMenu"));
+
+		if (AZombieGameMode* GM = PC->GetWorld()->GetAuthGameMode<AZombieGameMode>())
+			GM->ReturnToLobby();
+	}
 }
+
+void UZombieGameOver::SetIsHost(bool bHost)
+{
+	bIsHost = bHost;
+
+	if (btn_Volver)
+	{
+		btn_Volver->SetVisibility(bIsHost
+			? ESlateVisibility::Visible
+			: ESlateVisibility::Hidden);
+	}
+}
+

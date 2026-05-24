@@ -35,10 +35,12 @@ void AZombieGameMode::PostLogin(APlayerController* NewPlayer)
 
             if (APawn* Pawn = NewPlayer->GetPawn())
             {
-                Pawn->SetActorLocationAndRotation(
-                    Start->GetActorLocation(),
-                    Start->GetActorRotation()
-                );
+                FVector Loc = Start->GetActorLocation();
+                FRotator Rot = Start->GetActorRotation();
+                Pawn->SetActorLocationAndRotation(Loc, Rot);
+
+                if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(NewPlayer))
+                    ZPC->ClientForceRotation(Rot);
             }
             break;
         }
@@ -62,6 +64,21 @@ void AZombieGameMode::BeginPlay()
     Super::BeginPlay();
     if (AZombieGameState* GS = GetGameState<AZombieGameState>())
         GS->SetGamePhase(EGamePhase::Waiting);
+}
+
+void AZombieGameMode::ReturnToLobby()
+{
+    // Resetear estado de todos los jugadores
+    for (APlayerController* PC : ConnectedPlayers)
+    {
+        if (AZombiePlayerState* PS = PC->GetPlayerState<AZombiePlayerState>())
+        {
+            PS->SetIsZombie(false);
+            PS->TeamID = FName("Survivor");
+        }
+    }
+
+    GetWorld()->ServerTravel("/Game/Maps/LobbyMap?listen");
 }
 
 void AZombieGameMode::StartInfection()

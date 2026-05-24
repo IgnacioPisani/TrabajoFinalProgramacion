@@ -14,6 +14,7 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void BeginPlay() override;
+	void ReturnToLobby();
 	virtual void Logout(AController* Exiting) override;
 
 	void StartInfection();

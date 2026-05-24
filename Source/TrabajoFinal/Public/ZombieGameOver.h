@@ -12,6 +12,8 @@ class TRABAJOFINAL_API UZombieGameOver : public UUserWidget
 public:
 	void SetupResult(bool bZombiesWon, float Score);
 
+	void SetIsHost(bool bHost);
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -29,6 +31,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* btn_Volver = nullptr;
+	
+	bool bIsHost = false;
 
 private:
 	UFUNCTION()

@@ -2,6 +2,7 @@
 
 #include "Public/ZombiePlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/PlayerState.h"
 #include "Public/ZombieGameOver.h"
 #include "Public/ZombieHUD.h"
@@ -16,6 +17,60 @@ void AZombiePlayerController::ClientShowCountdown_Implementation(int32 Number)
 {
 	if (HUDWidget)
 		HUDWidget->ShowCountdown(Number);
+}
+
+void AZombiePlayerController::ClientForceRotation_Implementation(FRotator NewRotation)
+{
+	SetControlRotation(NewRotation);
+
+	if (APawn* MyPawn = GetPawn())
+	{
+		MyPawn->SetActorRotation(NewRotation);
+
+		if (ACharacter* Char = Cast<ACharacter>(MyPawn))
+			Char->bUseControllerRotationYaw = true;
+	}
+
+	FTimerHandle TimerHandle_Rot;
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_Rot,
+		[this, NewRotation]()
+		{
+			SetControlRotation(NewRotation);
+			if (APawn* MyPawn = GetPawn())
+				MyPawn->SetActorRotation(NewRotation);
+		},
+		0.3f, false);
+}
+
+void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon)
+{
+	SetPause(true);
+
+	if (HUDWidget)
+		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
+
+	if (GameOverWidgetClass)
+	{
+		GameOverWidget = CreateWidget<UZombieGameOver>(this, GameOverWidgetClass);
+		if (GameOverWidget)
+		{
+			float Score = 0.f;
+			if (APlayerState* PS = PlayerState)
+				Score = PS->GetScore();
+
+			GameOverWidget->SetupResult(bZombiesWon, Score);
+
+			// Solo el host ve el botón
+			bool bIsHost = (GetWorld()->GetFirstPlayerController() == this);
+			GameOverWidget->SetIsHost(bIsHost);
+
+			GameOverWidget->AddToViewport();
+		}
+	}
+
+	SetInputMode(FInputModeUIOnly());
+	bShowMouseCursor = true;
 }
 
 void AZombiePlayerController::BeginPlay()
@@ -52,28 +107,3 @@ void AZombiePlayerController::ClientUpdateTimer_Implementation(float TimeRemaini
 }
 
 
-
-void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon)
-{
-	SetPause(true);
-
-	if (HUDWidget)
-		HUDWidget->SetVisibility(ESlateVisibility::Hidden);
-
-	if (GameOverWidgetClass)
-	{
-		GameOverWidget = CreateWidget<UZombieGameOver>(this, GameOverWidgetClass);
-		if (GameOverWidget)
-		{
-			float Score = 0.f;
-			if (APlayerState* PS = PlayerState)
-				Score = PS->GetScore();
-
-			GameOverWidget->SetupResult(bZombiesWon, Score);
-			GameOverWidget->AddToViewport();
-		}
-	}
-
-	SetInputMode(FInputModeUIOnly());
-	bShowMouseCursor = true;
-}
