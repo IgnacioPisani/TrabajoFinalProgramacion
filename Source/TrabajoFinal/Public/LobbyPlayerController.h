@@ -14,6 +14,10 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateLobbyCount(int32 Current, int32 Required);
 
+	UFUNCTION(Client, Reliable)
+	void ClientForceRotation(FRotator NewRotation);
+
+	
 	// Server RPC — jugador avisa que está listo
 	UFUNCTION(Server, Reliable)
 	void ServerSetReady();

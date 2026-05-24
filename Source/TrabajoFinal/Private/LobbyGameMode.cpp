@@ -1,5 +1,6 @@
 #include "LobbyGameMode.h"
 #include "LobbyPlayerController.h"
+#include "GameFramework/Character.h"
 
 ALobbyGameMode::ALobbyGameMode()
 {
@@ -22,33 +23,53 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
         TimerHandle_UpdateCount,
         [this, NewPlayer, AssignedSlot]()
         {
-            // Teleportar al Target Point correspondiente
+            if (!NewPlayer) return;
             if (APawn* Pawn = NewPlayer->GetPawn())
             {
-                // Buscar el TP por nombre
+                // Ocultar antes de teleportar
+                Pawn->SetActorHiddenInGame(true);
+
                 FString TargetName = FString::Printf(TEXT("TP_Slot%d"), AssignedSlot);
                 for (TActorIterator<ATargetPoint> It(GetWorld()); It; ++It)
                 {
-                     if (It->GetActorLabel().Contains(TargetName))  
+                    if (It->GetActorLabel().Contains(TargetName))
                     {
                         Pawn->SetActorLocationAndRotation(
                             It->GetActorLocation(),
                             It->GetActorRotation()
                         );
-                        NewPlayer->SetControlRotation(It->GetActorRotation());
+
+                        if (ACharacter* Char = Cast<ACharacter>(Pawn))
+                            Char->GetCharacterMovement()->DisableMovement();
+
+                        FRotator TargetRot = It->GetActorRotation();
+                        if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(NewPlayer))
+                            LPC->ClientForceRotation(TargetRot);
+
+                        // Mostrar después de un frame
+                        FTimerHandle TimerHandle_Show;
+                        GetWorldTimerManager().SetTimer(
+                            TimerHandle_Show,
+                            [Pawn]()
+                            {
+                                if (Pawn)
+                                    Pawn->SetActorHiddenInGame(false);
+                            },
+                            0.2f, false);
+
+                        break;
                     }
-                    UE_LOG(LogTemp, Warning, TEXT("TargetPoint encontrado: %s"), *It->GetActorLabel());
                 }
             }
 
-            // Notificar conteo a todos
-            for (APlayerController* PC : LobbyPlayers)
-            {
-                if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
-                    LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
-            }
-        },
-        0.3f, false);
+      // Notificar conteo a todos
+      for (APlayerController* PC : LobbyPlayers)
+      {
+          if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+              LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MinPlayersToStart);
+      }
+  },
+  0.3f, false);
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)

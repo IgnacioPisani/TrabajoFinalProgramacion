@@ -5,8 +5,37 @@
 #include "LobbyWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraActor.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
+void ALobbyPlayerController::ClientForceRotation_Implementation(FRotator NewRotation)
+{
+	SetControlRotation(NewRotation);
 
+	// También rotar el Pawn directamente
+	if (APawn* MyPawn  = GetPawn())
+	{
+		MyPawn ->SetActorRotation(NewRotation);
+
+		// Bloquear el SpringArm para que no sobreescriba
+		if (ACharacter* Char = Cast<ACharacter>(MyPawn))
+		{
+			Char->GetCharacterMovement()->DisableMovement();
+			Char->bUseControllerRotationYaw = true;
+		}
+	}
+
+	FTimerHandle TimerHandle_Rot;
+	GetWorldTimerManager().SetTimer(
+		TimerHandle_Rot,
+		[this, NewRotation]()
+		{
+			SetControlRotation(NewRotation);
+			if (APawn* Pawn = GetPawn())
+				Pawn->SetActorRotation(NewRotation);
+		},
+		0.5f, false);
+}
 void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
