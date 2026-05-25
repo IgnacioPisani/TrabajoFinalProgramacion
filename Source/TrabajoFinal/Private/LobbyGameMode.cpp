@@ -34,7 +34,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
                 FString TargetName = FString::Printf(TEXT("TP_Slot%d"), AssignedSlot);
                 for (TActorIterator<ATargetPoint> It(GetWorld()); It; ++It)
                 {
-                    if (It->GetActorLabel().Contains(TargetName))
+                    if (It->ActorHasTag(FName(*TargetName)))
                     {
                         Pawn->SetActorLocationAndRotation(
                             It->GetActorLocation(),
