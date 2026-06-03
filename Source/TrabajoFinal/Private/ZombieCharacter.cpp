@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ZombieGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "Public/ZombieGameMode.h"
 #include "Public/ZombiePlayerState.h"
 
@@ -156,9 +157,9 @@ void AZombieCharacter::NetMulticast_OnInfected_Implementation()
 {
     UE_LOG(LogTemp, Warning, TEXT("%s fue infectado!"), *GetName());
 
-    // reproducir sonido 
+    if (InfectionSound)
+        UGameplayStatics::PlaySoundAtLocation(this, InfectionSound, GetActorLocation());
 }
-
 
 void AZombieCharacter::TakeDamageZombie(float DamageAmount)
 {

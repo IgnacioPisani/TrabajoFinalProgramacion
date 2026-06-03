@@ -17,6 +17,9 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Combat")
 	float Health = 100.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	USoundBase* InfectionSound = nullptr;
+
 	void ApplyZombieVisuals(bool bIsZombie);
 
 	UFUNCTION()
