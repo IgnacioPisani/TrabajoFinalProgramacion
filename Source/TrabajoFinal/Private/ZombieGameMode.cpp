@@ -19,12 +19,16 @@ AZombieGameMode::AZombieGameMode()
      GameStateClass   = AZombieGameState::StaticClass();
      PlayerControllerClass = AZombiePlayerController::StaticClass();
      DefaultPawnClass = AZombieCharacter::StaticClass();
+     bUseSeamlessTravel = true;
+
 }
 
 void AZombieGameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     ConnectedPlayers.Add(NewPlayer);
+    UE_LOG(LogTemp, Warning, TEXT("PostLogin - ConnectedPlayers: %d"), ConnectedPlayers.Num());
+    UE_LOG(LogTemp, Warning, TEXT("HasAuthority: %s"), HasAuthority() ? TEXT("YES") : TEXT("NO"));
 
     for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
     {
@@ -52,12 +56,55 @@ void AZombieGameMode::PostLogin(APlayerController* NewPlayer)
     }
 }
 
+void AZombieGameMode::HandleSeamlessTravelPlayer(AController*& C)
+{
+    Super::HandleSeamlessTravelPlayer(C);
+
+    if (APlayerController* PC = Cast<APlayerController>(C))
+    {
+        ConnectedPlayers.AddUnique(PC);
+        UE_LOG(LogTemp, Warning, TEXT("HandleSeamlessTravelPlayer - Players: %d"), ConnectedPlayers.Num());
+
+        // Asignar spawn point
+        for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
+        {
+            APlayerStart* Start = *It;
+            if (!UsedSpawnPoints.Contains(Start))
+            {
+                UsedSpawnPoints.Add(Start);
+
+                if (APawn* Pawn = PC->GetPawn())
+                {
+                    FVector Loc = Start->GetActorLocation();
+                    FRotator Rot = Start->GetActorRotation();
+                    Pawn->SetActorLocationAndRotation(Loc, Rot);
+
+                    if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
+                        ZPC->ClientForceRotation(Rot);
+                }
+                break;
+            }
+        }
+
+        // Arrancar cuando hay suficientes jugadores
+        if (ConnectedPlayers.Num() >= MinPlayersToStart)
+        {
+            GetWorldTimerManager().ClearTimer(TimerHandle_StartGame);
+            GetWorldTimerManager().SetTimer(
+                TimerHandle_StartGame, this,
+                &AZombieGameMode::StartCountdown,
+                3.f, false);
+        }
+    }
+}
+
 void AZombieGameMode::Logout(AController* Exiting)
 {
     Super::Logout(Exiting);
     if (APlayerController* PC = Cast<APlayerController>(Exiting))
         ConnectedPlayers.Remove(PC);
 }
+
 
 void AZombieGameMode::BeginPlay()
 {
@@ -102,6 +149,7 @@ void AZombieGameMode::ReturnToLobby()
 void AZombieGameMode::StartInfection()
 {
     if (ConnectedPlayers.Num() == 0) return;
+    UE_LOG(LogTemp, Warning, TEXT("StartInfection - Players: %d"), ConnectedPlayers.Num());
 
     int32 Idx = FMath::RandRange(0, ConnectedPlayers.Num() - 1);
     APlayerController* ChosenPC = ConnectedPlayers[Idx];
@@ -111,6 +159,9 @@ void AZombieGameMode::StartInfection()
 
     for (APlayerController* PC : ConnectedPlayers)
     {
+        UE_LOG(LogTemp, Warning, TEXT("PC: %s - IsA ZombiePC: %s"), 
+    *PC->GetName(),
+    Cast<AZombiePlayerController>(PC) ? TEXT("YES") : TEXT("NO"));
         if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
         {
             bool bIsZombie = (PC == ChosenPC);
@@ -192,6 +243,7 @@ void AZombieGameMode::RespawnPlayer(AController* Controller)
 void AZombieGameMode::StartCountdown()
 {
     CountdownValue = 3;
+    UE_LOG(LogTemp, Warning, TEXT("StartCountdown llamado - Players: %d"), ConnectedPlayers.Num());
 
     for (APlayerController* PC : ConnectedPlayers)
         if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))

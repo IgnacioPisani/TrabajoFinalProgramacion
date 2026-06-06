@@ -16,6 +16,7 @@ public:
 	virtual void BeginPlay() override;
 	void ReturnToLobby();
 	virtual void Logout(AController* Exiting) override;
+	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 
 	void StartInfection();
 	void CheckVictoryCondition();

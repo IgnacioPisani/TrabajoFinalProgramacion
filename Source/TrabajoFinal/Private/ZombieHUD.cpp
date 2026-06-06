@@ -95,18 +95,15 @@ void UZombieHUD::UpdateTimer(float TimeRemaining)
 
 void UZombieHUD::UpdateRole(bool bIsZombie)
 {
-	if (!txt_Rol) return;
+	if (!img_Rol || !txt_Rol) return;
 
-	if (img_Rol)
+	UTexture2D* Textura = bIsZombie ? ImagenZombiesRol : ImagenSobrevivientesRol;
+	if (Textura)
 	{
-		UTexture2D* Textura = bIsZombie ? ImagenZombiesRol : ImagenSobrevivientesRol;
-		if (Textura)
-		{
-			img_Rol->SetBrushFromTexture(Textura);
-			img_Rol->SetVisibility(ESlateVisibility::Visible);
-
-		}
+		img_Rol->SetBrushFromTexture(Textura);
+		img_Rol->SetVisibility(ESlateVisibility::Visible);
 	}
+
 	FString Rol = bIsZombie ? TEXT("INFECTA!") : TEXT("SOBREVIVE!");
 	txt_Rol->SetText(FText::FromString(Rol));
 	txt_Rol->SetVisibility(ESlateVisibility::Visible);
@@ -131,26 +128,32 @@ void UZombieHUD::ShowRoleAlert(bool bIsZombie)
 	if (Textura)
 		img_Alerta->SetBrushFromTexture(Textura);
 
-	FadeWidget(img_Alerta, true, 0.5f, [this]()
-	{
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_HideAlert,
-			[this]() { FadeWidget(img_Alerta, false, 0.5f); },
-			2.f, false);
-	});
+	img_Alerta->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_HideAlert,
+		[this]() 
+		{ 
+			if (img_Alerta)
+				img_Alerta->SetVisibility(ESlateVisibility::Hidden); 
+		},
+		3.f, false);
 }
 
 void UZombieHUD::ShowInfectedOverlay()
 {
 	if (!img_InfectedOverlay) return;
 
-	FadeWidget(img_InfectedOverlay, true, 0.3f, [this]()
-	{
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle_HideOverlay,
-			[this]() { FadeWidget(img_InfectedOverlay, false, 0.5f); },
-			2.f, false);
-	});
+	img_InfectedOverlay->SetVisibility(ESlateVisibility::Visible);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimerHandle_HideOverlay,
+		[this]() 
+		{ 
+			if (img_InfectedOverlay)
+				img_InfectedOverlay->SetVisibility(ESlateVisibility::Hidden); 
+		},
+		3.f, false);
 }
 
 void UZombieHUD::ShowCountdown(int32 Number)
@@ -159,13 +162,11 @@ void UZombieHUD::ShowCountdown(int32 Number)
 
 	if (Number <= 0)
 	{
-		FadeWidget(txt_Countdown, false, 0.3f);
+		txt_Countdown->SetVisibility(ESlateVisibility::Hidden);
 		return;
 	}
 
 	FString Texto = FString::Printf(TEXT("%d"), Number);
 	txt_Countdown->SetText(FText::FromString(Texto));
 	txt_Countdown->SetVisibility(ESlateVisibility::Visible);
-
-	FadeWidget(txt_Countdown, true, 0.2f);
 }
