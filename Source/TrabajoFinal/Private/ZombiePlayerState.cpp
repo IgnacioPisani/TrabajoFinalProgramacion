@@ -53,11 +53,8 @@ void AZombiePlayerState::OnRep_IsZombie()
             ZC->ApplyZombieVisuals(bIsZombie);
     }
 
-	APlayerController* PC = Cast<APlayerController>(GetOwner());
-	if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
-	{
+	if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(GetOwner()))
 		ZPC->ClientShowRole(bIsZombie);
-	}
 
 }
 

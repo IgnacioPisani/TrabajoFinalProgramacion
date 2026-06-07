@@ -29,7 +29,7 @@ void AZombieCharacter::BeginPlay()
             TimerHandle_Mat,
             [this]()
             {
-                if (APlayerController* PC = Cast<APlayerController>(GetController()))
+                if (APlayerController* PC = GetController<APlayerController>())
                 {
                     if (UZombieGameInstance* GI = PC->GetGameInstance<UZombieGameInstance>())
                     {
