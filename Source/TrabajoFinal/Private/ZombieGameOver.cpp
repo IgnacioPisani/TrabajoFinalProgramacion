@@ -45,8 +45,8 @@ void UZombieGameOver::OnVolverClicked()
 	{
 		PC->SetPause(false);
 
-		if (AZombieGameMode* GM = PC->GetWorld()->GetAuthGameMode<AZombieGameMode>())
-			GM->ReturnToLobby();
+		if (UWorld* World = PC->GetWorld())
+			World->ServerTravel(World->GetName() + "?listen");
 	}
 }
 

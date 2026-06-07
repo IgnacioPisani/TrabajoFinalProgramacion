@@ -130,12 +130,14 @@ void UZombieHUD::ShowRoleAlert(bool bIsZombie)
 
 	img_Alerta->SetVisibility(ESlateVisibility::Visible);
 
+	TWeakObjectPtr<UZombieHUD> WeakThis(this);
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_HideAlert,
-		[this]() 
-		{ 
-			if (img_Alerta)
-				img_Alerta->SetVisibility(ESlateVisibility::Hidden); 
+		[WeakThis]()
+		{
+			if (!WeakThis.IsValid()) return;
+			if (WeakThis->img_Alerta)
+				WeakThis->img_Alerta->SetVisibility(ESlateVisibility::Hidden);
 		},
 		3.f, false);
 }
@@ -146,12 +148,14 @@ void UZombieHUD::ShowInfectedOverlay()
 
 	img_InfectedOverlay->SetVisibility(ESlateVisibility::Visible);
 
+	TWeakObjectPtr<UZombieHUD> WeakThis(this);
 	GetWorld()->GetTimerManager().SetTimer(
 		TimerHandle_HideOverlay,
-		[this]() 
-		{ 
-			if (img_InfectedOverlay)
-				img_InfectedOverlay->SetVisibility(ESlateVisibility::Hidden); 
+		[WeakThis]()
+		{
+			if (!WeakThis.IsValid()) return;
+			if (WeakThis->img_InfectedOverlay)
+				WeakThis->img_InfectedOverlay->SetVisibility(ESlateVisibility::Hidden);
 		},
 		3.f, false);
 }
