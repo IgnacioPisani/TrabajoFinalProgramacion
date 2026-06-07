@@ -1,5 +1,8 @@
 #include "LobbyGameMode.h"
 #include "LobbyPlayerController.h"
+#include "Engine/TargetPoint.h"
+#include "EngineUtils.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "ZombiePlayerState.h"
 #include "GameFramework/Character.h"
 
@@ -8,9 +11,6 @@ ALobbyGameMode::ALobbyGameMode()
     bUseSeamlessTravel = true;  // viaje sin pantalla de carga abrupta
     PlayerStateClass = AZombiePlayerState::StaticClass();  // <- agregar
 }
-#include "Engine/TargetPoint.h"
-#include "EngineUtils.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -18,7 +18,6 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
     LobbyPlayers.Add(NewPlayer);
 
     // Asignar slot — host toma el centroint32 SlotOrder[] = {1, 0, 2, 3};
-    SlotOrder = {1, 0, 2, 3};
     int32 AssignedSlot = SlotOrder[FMath::Min(LobbyPlayers.Num() - 1, 3)];
     FTimerHandle TimerHandle_UpdateCount;
     GetWorldTimerManager().SetTimer(

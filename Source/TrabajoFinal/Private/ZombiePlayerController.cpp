@@ -83,11 +83,6 @@ void AZombiePlayerController::BeginPlay()
 	}
 }
 
-void AZombiePlayerController::SetupInputComponent()
-{
-	Super::SetupInputComponent();
-}
-
 void AZombiePlayerController::ClientShowRole_Implementation(bool bIsZombie)
 {
 	if (HUDWidget)

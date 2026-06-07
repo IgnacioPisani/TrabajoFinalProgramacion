@@ -14,9 +14,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Combat")
-	float Health = 100.f;
-
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 	USoundBase* InfectionSound = nullptr;
 
@@ -33,9 +30,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_OnInfected();
 
-	void TakeDamageZombie(float DamageAmount);
-	void OnDeath();
-
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	TArray<UMaterialInterface*> PlayerMaterials;
 
@@ -46,8 +40,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_SetMaterial(int32 Index);
 protected:
-	virtual void GetLifetimeReplicatedProps(
-		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")
 	UMaterialInterface* ZombieMaterial = nullptr;
@@ -57,7 +49,6 @@ protected:
 
 	
 private:
-	FTimerHandle TimerHandle_Respawn;
 
 	UPROPERTY(VisibleAnywhere, Category = "FX")
 	class UNiagaraComponent* ZombieTrailFX = nullptr;

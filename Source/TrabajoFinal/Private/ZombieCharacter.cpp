@@ -9,9 +9,6 @@
 #include "Public/ZombieGameMode.h"
 #include "Public/ZombiePlayerState.h"
 
-class UZombieGameInstance;
-class AZombieGameMode;
-class AZombiePlayerState;
 
 AZombieCharacter::AZombieCharacter()
 {
@@ -62,14 +59,6 @@ void AZombieCharacter::OnRep_PlayerState()
         UE_LOG(LogTemp, Warning, TEXT("PlayerMaterials num: %d"), PlayerMaterials.Num());
     }
 }
-void AZombieCharacter::GetLifetimeReplicatedProps(
-    TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-    DOREPLIFETIME(AZombieCharacter, Health);
-}
-
-
 
 void AZombieCharacter::ApplyZombieVisuals(bool bIsZombie)
 {
@@ -144,7 +133,6 @@ void AZombieCharacter::AssignMaterial(int32 Index)
 }
 
 
-
 void AZombieCharacter::NetMulticast_SetMaterial_Implementation(int32 Index)
 {
     if (!PlayerMaterials.IsValidIndex(Index)) return;
@@ -159,43 +147,4 @@ void AZombieCharacter::NetMulticast_OnInfected_Implementation()
 
     if (InfectionSound)
         UGameplayStatics::PlaySoundAtLocation(this, InfectionSound, GetActorLocation());
-}
-
-void AZombieCharacter::TakeDamageZombie(float DamageAmount)
-{
-    if (!HasAuthority()) return; 
-    Health -= DamageAmount;
-    if (Health <= 0.f) OnDeath();
-}
-
-void AZombieCharacter::OnDeath()
-{
-    if (AZombiePlayerState* PS = GetPlayerState<AZombiePlayerState>())
-    {
-        if (!PS->bIsZombie)
-        {
-            PS->SetIsZombie(true);
-            NetMulticast_OnInfected();
-
-            if (AZombieGameMode* GM = GetWorld()->GetAuthGameMode<AZombieGameMode>())
-            {
-                GM->CheckVictoryCondition();
-            }
-        }
-    }
-
-    GetWorldTimerManager().SetTimer(
-        TimerHandle_Respawn,
-        [this]()
-        {
-            if (AZombieGameMode* GM = GetWorld()->GetAuthGameMode<AZombieGameMode>())
-            {
-
-            }
-        },
-        3.f, false
-    );
-
-    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    GetMesh()->SetVisibility(false);
 }

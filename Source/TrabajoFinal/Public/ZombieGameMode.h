@@ -21,7 +21,6 @@ public:
 	void StartInfection();
 	void CheckVictoryCondition();
 	void EndGame(bool bZombiesWon);
-	void RespawnPlayer(AController* Controller);
 	void StartCountdown();
 
 private:

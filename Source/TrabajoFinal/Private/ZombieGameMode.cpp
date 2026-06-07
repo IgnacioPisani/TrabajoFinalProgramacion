@@ -9,9 +9,6 @@
 #include "Public/ZombiePlayerController.h"
 #include "Public/ZombiePlayerState.h"
 
-class AZombiePlayerController;
-class AZombiePlayerState;
-class AZombieGameState;
 
 AZombieGameMode::AZombieGameMode()
 {
@@ -142,7 +139,8 @@ void AZombieGameMode::ReturnToLobby()
             PS->TeamID = FName("Survivor");
         }
     }
-
+    ConnectedPlayers.Empty();
+    UsedSpawnPoints.Empty();
     GetWorld()->ServerTravel("/Game/Maps/LobbyMap?listen");
 }
 
@@ -159,19 +157,12 @@ void AZombieGameMode::StartInfection()
 
     for (APlayerController* PC : ConnectedPlayers)
     {
-        UE_LOG(LogTemp, Warning, TEXT("PC: %s - IsA ZombiePC: %s"), 
-    *PC->GetName(),
-    Cast<AZombiePlayerController>(PC) ? TEXT("YES") : TEXT("NO"));
         if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
         {
             bool bIsZombie = (PC == ChosenPC);
             ZPC->ClientShowRole(bIsZombie);
-        }
-    }
-    for (APlayerController* PC : ConnectedPlayers)
-    {
-        if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
             ZPC->ClientUpdateCount(ConnectedPlayers.Num() - 1, 1);
+        }
     }
 
     if (AZombieGameState* GS = GetGameState<AZombieGameState>())
@@ -180,27 +171,31 @@ void AZombieGameMode::StartInfection()
         GS->TimeRemaining = GameDuration;
     }
 
+    TWeakObjectPtr<AZombieGameMode> WeakThis(this);
     GetWorldTimerManager().SetTimer(
         TimerHandle_Countdown,
-        [this]()
+        [WeakThis]()
         {
-            AZombieGameState* GS = GetGameState<AZombieGameState>();
+            if (!WeakThis.IsValid()) return;
+
+            AZombieGameState* GS = WeakThis->GetGameState<AZombieGameState>();
             if (!GS) return;
+
             GS->TimeRemaining -= 1.f;
 
-      for (APlayerController* PC : ConnectedPlayers)
-      {
-          if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
-              ZPC->ClientUpdateTimer(GS->TimeRemaining);
-      }
+            for (APlayerController* PC : WeakThis->ConnectedPlayers)
+            {
+                if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
+                    ZPC->ClientUpdateTimer(GS->TimeRemaining);
+            }
 
-      if (GS->TimeRemaining <= 0.f)
-      {
-          GetWorldTimerManager().ClearTimer(TimerHandle_Countdown);
-          EndGame(false);
-      }
+            if (GS->TimeRemaining <= 0.f)
+            {
+                WeakThis->GetWorldTimerManager().ClearTimer(WeakThis->TimerHandle_Countdown);
+                WeakThis->EndGame(false);
+            }
         },
-        1.f, true); 
+        1.f, true);
 }
 
 void AZombieGameMode::CheckVictoryCondition()
@@ -228,18 +223,6 @@ void AZombieGameMode::CheckVictoryCondition()
 }
 
 
-
-void AZombieGameMode::RespawnPlayer(AController* Controller)
-{
-    if (!Controller) return;
-
-    AActor* StartSpot = FindPlayerStart(Controller);
-    FVector SpawnLoc = StartSpot ? StartSpot->GetActorLocation() : FVector::ZeroVector;
-
-    APawn* NewPawn = SpawnDefaultPawnFor(Controller, StartSpot);
-    Controller->Possess(NewPawn);
-}
-
 void AZombieGameMode::StartCountdown()
 {
     CountdownValue = 3;
@@ -249,21 +232,24 @@ void AZombieGameMode::StartCountdown()
         if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
             ZPC->ClientShowCountdown(CountdownValue);
 
+    TWeakObjectPtr<AZombieGameMode> WeakThis(this);
     GetWorldTimerManager().SetTimer(
         TimerHandle_Countdown_Pre,
-        [this]()
+        [WeakThis]()
         {
-            CountdownValue--;
+            if (!WeakThis.IsValid()) return;
 
-            for (APlayerController* PC : ConnectedPlayers)
+            WeakThis->CountdownValue--;
+
+            for (APlayerController* PC : WeakThis->ConnectedPlayers)
                 if (AZombiePlayerController* ZPC = Cast<AZombiePlayerController>(PC))
-                    ZPC->ClientShowCountdown(CountdownValue);
+                    ZPC->ClientShowCountdown(WeakThis->CountdownValue);
 
-            if (CountdownValue <= 0)
+            if (WeakThis->CountdownValue <= 0)
             {
-                GetWorldTimerManager().ClearTimer(TimerHandle_Countdown_Pre);
-                StartInfection();
+                WeakThis->GetWorldTimerManager().ClearTimer(WeakThis->TimerHandle_Countdown_Pre);
+                WeakThis->StartInfection();
             }
         },
-        1.f, true); 
+        1.f, true);
 }
