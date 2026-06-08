@@ -69,7 +69,7 @@ void ULobbyWidget::UpdateReadyCount(int32 Ready, int32 Total)
 
 void ULobbyWidget::OnReadyClicked()
 {
-	if (bIsReady) return;  // no puede des-listarse
+	if (bIsReady) return;  
 	bIsReady = true;
 
 	// Cambiar visual del botón para mostrar que está listo

@@ -123,7 +123,7 @@ void AZombieGameMode::EndGame(bool bZombiesWon)
         {
             // El host es siempre el índice 0
             bool bIsHost = (i == 0);
-            ZPC->ClientGameOver(bZombiesWon, bIsHost);  // <- agregar bIsHost
+            ZPC->ClientGameOver(bZombiesWon, bIsHost); 
         }
     }
 }

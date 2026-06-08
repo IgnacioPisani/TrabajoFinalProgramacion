@@ -18,7 +18,7 @@ void ALobbyPlayerController::ClientForceRotation_Implementation(FRotator NewRota
 {
 	SetControlRotation(NewRotation);
 
-	// También rotar el Pawn directamente
+	// rotar el Pawn directamente
 	if (APawn* MyPawn  = GetPawn())
 	{
 		MyPawn ->SetActorRotation(NewRotation);
@@ -70,7 +70,7 @@ void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bAutoManageActiveCameraTarget = false;  // <- primero esto
+	bAutoManageActiveCameraTarget = false;  
 
 	if (IsLocalController() && LobbyWidgetClass)
 	{
@@ -89,7 +89,6 @@ void ALobbyPlayerController::BeginPlay()
 	bShowMouseCursor = true;
 	SetInputMode(FInputModeGameAndUI());
 
-	// Solo el loop con tag — borrar el otro
 	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
 	{
 		if (It->ActorHasTag(FName("LobbyCamera")))
@@ -118,7 +117,7 @@ void ALobbyPlayerController::ClientSetLobbyCamera_Implementation(int32 SlotIndex
 
 	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
 	{
-		if (It->ActorHasTag(FName(*CamTag)))  // <- reemplazar GetActorLabel
+		if (It->ActorHasTag(FName(*CamTag)))  
 		{
 			SetViewTargetWithBlend(*It, 0.5f);
 			break;

@@ -62,7 +62,7 @@ void AZombiePlayerController::ClientGameOver_Implementation(bool bZombiesWon, bo
 				Score = PS->GetScore();
 
 			GameOverWidget->SetupResult(bZombiesWon, Score);
-			GameOverWidget->SetIsHost(bIsHost);  // viene del servidor
+			GameOverWidget->SetIsHost(bIsHost); 
 			GameOverWidget->AddToViewport();
 		}
 	}

@@ -8,8 +8,8 @@
 
 ALobbyGameMode::ALobbyGameMode()
 {
-    bUseSeamlessTravel = true;  // viaje sin pantalla de carga abrupta
-    PlayerStateClass = AZombiePlayerState::StaticClass();  // <- agregar
+    bUseSeamlessTravel = true;  
+    PlayerStateClass = AZombiePlayerState::StaticClass();  
 }
 
 void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
@@ -17,7 +17,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
     Super::PostLogin(NewPlayer);
     LobbyPlayers.Add(NewPlayer);
 
-    // Asignar slot — host toma el centroint32 SlotOrder[] = {1, 0, 2, 3};
+    // Asignar slot — host toma el centroint32 SlotOrder[] ;
     int32 AssignedSlot = SlotOrder[FMath::Min(LobbyPlayers.Num() - 1, 3)];
     FTimerHandle TimerHandle_UpdateCount;
     GetWorldTimerManager().SetTimer(
@@ -107,7 +107,7 @@ void ALobbyGameMode::SetPlayerReady(APlayerController* Player)
             LPC->ClientUpdateReadyCount(ReadyPlayers.Num(), LobbyPlayers.Num());
     }
 
-    // Si todos están listos → iniciar directamente, sin botón
+    // Si todos están listos iniciar directamente, sin botón
     if (ReadyPlayers.Num() >= LobbyPlayers.Num() && LobbyPlayers.Num() >= MinPlayersToStart)
         StartGame();
 }

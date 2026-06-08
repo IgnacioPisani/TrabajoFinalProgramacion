@@ -15,16 +15,13 @@ void AZombieGameState::GetLifetimeReplicatedProps(
 
 void AZombieGameState::OnRep_GamePhase()
 {
-	// Se ejecuta en TODOS los clientes cuando GamePhase cambia
-	// Acá después conectás con el widget para actualizar la UI
 	UE_LOG(LogTemp, Warning, TEXT("GamePhase changed to: %d"), (int32)GamePhase);
 }
 
 void AZombieGameState::SetGamePhase(EGamePhase NewPhase)
 {
-	// Solo el servidor llama esta función
 	GamePhase = NewPhase;
-	OnRep_GamePhase(); // llamado manual en servidor (RepNotify no se auto-dispara en server)
+	OnRep_GamePhase();
 }
 
 void AZombieGameState::UpdateCounts(int32 Survivors, int32 Zombies)
