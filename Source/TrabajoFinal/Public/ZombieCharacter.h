@@ -39,6 +39,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_SetMaterial(int32 Index);
+	
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Visuals")

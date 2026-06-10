@@ -22,17 +22,22 @@ public:
 	FName TeamID = "Survivor";
 
 	void AddScore(float Amount);
+	
 	void SetIsZombie(bool bNewValue);
 
 	UFUNCTION()
 	void OnRep_IsZombie();
+	
 	UPROPERTY(Replicated)
 	int32 SelectedMaterialIndex = 0;
 
 	void SetSelectedMaterial(int32 Index);
+	
 protected:
+	
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	virtual void CopyProperties(APlayerState* PlayerState) override;
 
 };

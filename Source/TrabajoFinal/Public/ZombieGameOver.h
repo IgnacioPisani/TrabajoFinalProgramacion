@@ -1,4 +1,3 @@
-// ZombieGameOver.h
 #pragma once
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
@@ -10,11 +9,13 @@ class TRABAJOFINAL_API UZombieGameOver : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	
 	void SetupResult(bool bZombiesWon, float Score);
 
 	void SetIsHost(bool bHost);
 
 protected:
+	
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
@@ -35,6 +36,7 @@ protected:
 	bool bIsHost = false;
 
 private:
+	
 	UFUNCTION()
 	void OnVolverClicked();
 };

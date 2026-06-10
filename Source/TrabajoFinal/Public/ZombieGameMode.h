@@ -13,18 +13,28 @@ public:
 	AZombieGameMode();
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	
 	virtual void BeginPlay() override;
+	
 	void ReturnToLobby();
+	
 	virtual void Logout(AController* Exiting) override;
+	
 	virtual void HandleSeamlessTravelPlayer(AController*& C) override;
 
 	void StartInfection();
+	
 	void CheckVictoryCondition();
+	
 	void EndGame(bool bZombiesWon);
+	
 	void StartCountdown();
 
 private:
+	
 	TArray<APlayerController*> ConnectedPlayers;
+
+	TArray<AActor*> UsedSpawnPoints;  
 
 	UPROPERTY(EditDefaultsOnly, Category = "Game")
 	int32 MinPlayersToStart = 2;
@@ -32,13 +42,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Game")
 	float GameDuration = 120.f;
 	
-	TArray<AActor*> UsedSpawnPoints;  
-    
 	FTimerHandle TimerHandle_StartGame;
 	
 	FTimerHandle TimerHandle_Countdown;
 
+	FTimerHandle TimerHandle_Countdown_Pre;  
+
 	int32 CountdownValue = 3;
 	
-	FTimerHandle TimerHandle_Countdown_Pre;  
 };

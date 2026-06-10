@@ -14,9 +14,7 @@ enum class EGamePhase : uint8
 	GameOver
 };
 
-/**
- * 
- */
+
 UCLASS()
 class TRABAJOFINAL_API AZombieGameState : public AGameStateBase
 {
@@ -39,9 +37,11 @@ public:
 	void OnRep_GamePhase();
 
 	void SetGamePhase(EGamePhase NewPhase);
+	
 	void UpdateCounts(int32 Survivors, int32 Zombies);
 
 protected:
+	
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

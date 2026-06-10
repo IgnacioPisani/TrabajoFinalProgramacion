@@ -45,7 +45,6 @@ void UZombieHUD::FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunc
 	TSharedPtr<int32> CurrentStep = MakeShared<int32>(0);
 	TSharedPtr<FTimerHandle> Handle = MakeShared<FTimerHandle>();
 
-	// Usar TWeakObjectPtr para verificar si el widget sigue vivo
 	TWeakObjectPtr<UWidget> WeakWidget(Widget);
 	TWeakObjectPtr<UZombieHUD> WeakThis(this);
 
@@ -56,7 +55,7 @@ void UZombieHUD::FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunc
 			// Verificar que tanto el HUD como el widget siguen vivos
 			if (!WeakThis.IsValid() || !WeakWidget.IsValid())
 			{
-				return;  // el widget fue destruido, salimos sin crashear
+				return;  
 			}
 
 			(*CurrentStep)++;

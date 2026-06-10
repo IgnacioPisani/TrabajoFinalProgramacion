@@ -16,9 +16,9 @@ class TRABAJOFINAL_API AZombiePlayerController : public ATrabajoFinalPlayerContr
 	GENERATED_BODY()
 
 public:
+	
 	UFUNCTION(Client, Reliable)
 	void ClientShowRole(bool bIsZombie);
-
 
 	UFUNCTION(Client, Unreliable)
 	void ClientUpdateTimer(float TimeRemaining);
@@ -36,6 +36,7 @@ public:
 	void ClientGameOver(bool bZombiesWon, bool bIsHost);
 	
 protected:
+	
 	virtual void BeginPlay() override;
 
 private:

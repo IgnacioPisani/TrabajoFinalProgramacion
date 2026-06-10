@@ -15,8 +15,6 @@ void ULobbyWidget::NativeConstruct()
 		btn_Color2->OnClicked.AddDynamic(this, &ULobbyWidget::OnColor2Clicked);
 	if (btn_Color3)
 		btn_Color3->OnClicked.AddDynamic(this, &ULobbyWidget::OnColor3Clicked);
-
-
 	if (btn_Ready)
 		btn_Ready->OnClicked.AddDynamic(this, &ULobbyWidget::OnReadyClicked);
 

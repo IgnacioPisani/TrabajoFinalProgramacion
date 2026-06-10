@@ -15,7 +15,8 @@ void AZombiePlayerState::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AZombiePlayerState, bIsZombie);
 	DOREPLIFETIME(AZombiePlayerState, TeamID);
-	DOREPLIFETIME(AZombiePlayerState, SelectedMaterialIndex);}
+	DOREPLIFETIME(AZombiePlayerState, SelectedMaterialIndex);
+}
 
 void AZombiePlayerState::CopyProperties(APlayerState* PlayerState)
 {
@@ -33,6 +34,7 @@ void AZombiePlayerState::CopyProperties(APlayerState* PlayerState)
 		UE_LOG(LogTemp, Warning, TEXT("CopyProperties cast fallido"));
 	}
 }
+
 void AZombiePlayerState::SetIsZombie(bool bNewValue)
 {
 	bIsZombie = bNewValue;

@@ -62,11 +62,15 @@ protected:
 
 private:
 	FTimerHandle TimerHandle_HideAlert;
+	
 	FTimerHandle TimerHandle_HideOverlay;
 
-	void FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunction<void()> OnComplete = nullptr);
-
 	FTimerHandle TimerHandle_FadeAlert;
+	
 	FTimerHandle TimerHandle_FadeOverlay;
+	
 	FTimerHandle TimerHandle_HideCountdown;
+
+	void FadeWidget(UWidget* Widget, bool bFadeIn, float Duration, TFunction<void()> OnComplete = nullptr);
+	
 };

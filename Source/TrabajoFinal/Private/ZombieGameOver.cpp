@@ -1,4 +1,3 @@
-// ZombieGameOver.cpp
 #include "Public/ZombieGameOver.h"
 
 #include "ZombieGameMode.h"

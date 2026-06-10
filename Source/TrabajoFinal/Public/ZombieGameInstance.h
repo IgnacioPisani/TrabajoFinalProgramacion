@@ -9,7 +9,7 @@ class TRABAJOFINAL_API UZombieGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	// Clave: PlayerName, Valor: MaterialIndex
+
 	TMap<FString, int32> PlayerMaterialMap;
 
 	void SetPlayerMaterial(FString PlayerName, int32 Index)

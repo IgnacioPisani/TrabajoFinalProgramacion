@@ -17,7 +17,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
     Super::PostLogin(NewPlayer);
     LobbyPlayers.Add(NewPlayer);
 
-    // Asignar slot — host toma el centroint32 SlotOrder[] ;
+    // Asignar slot
     int32 AssignedSlot = SlotOrder[FMath::Min(LobbyPlayers.Num() - 1, 3)];
     FTimerHandle TimerHandle_UpdateCount;
     GetWorldTimerManager().SetTimer(
@@ -67,7 +67,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
       for (APlayerController* PC : LobbyPlayers)
       {
           if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
-LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MaxPlayers, MinPlayersToStart);
+            LPC->ClientUpdateLobbyCount(LobbyPlayers.Num(), MaxPlayers, MinPlayersToStart);
       }
   },
   0.3f, false);
@@ -107,14 +107,14 @@ void ALobbyGameMode::SetPlayerReady(APlayerController* Player)
             LPC->ClientUpdateReadyCount(ReadyPlayers.Num(), LobbyPlayers.Num());
     }
 
-    // Si todos están listos iniciar directamente, sin botón
+    // Si todos están listos iniciar 
     if (ReadyPlayers.Num() >= LobbyPlayers.Num() && LobbyPlayers.Num() >= MinPlayersToStart)
         StartGame();
 }
 
 void ALobbyGameMode::StartGame()
 {
-    // Viajar al mapa de juego — arrastra a todos los clientes
+    // Viajar al mapa de juego 
     FString TravelURL = GameMapPath + "?listen";
     GetWorld()->ServerTravel(TravelURL);
 }

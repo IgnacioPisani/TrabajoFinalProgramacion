@@ -37,14 +37,19 @@ protected:
 	class UButton* btn_Color2 = nullptr;  
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* btn_Color3 = nullptr;  
+	class UButton* btn_Color3 = nullptr;
+	
 private:
+	
 	UFUNCTION()
 	void OnColor0Clicked();
+	
 	UFUNCTION()
 	void OnColor1Clicked();
+	
 	UFUNCTION()
 	void OnColor2Clicked();
+	
 	UFUNCTION()
 	void OnColor3Clicked();
 

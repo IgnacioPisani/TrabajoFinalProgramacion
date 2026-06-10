@@ -14,6 +14,39 @@
 class UZombieGameInstance;
 class AZombiePlayerState;
 
+void ALobbyPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	bAutoManageActiveCameraTarget = false;  
+
+	if (IsLocalController() && LobbyWidgetClass)
+	{
+		LobbyHUD = CreateWidget<ULobbyWidget>(this, LobbyWidgetClass);
+		if (LobbyHUD)
+		{
+			LobbyHUD->AddToViewport();
+			bIsHost = (GetWorld()->GetFirstPlayerController() == this);
+			int32 Required = 4;
+			if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
+				Required = GM->MaxPlayers;
+			LobbyHUD->UpdatePlayerCount(1, Required);
+		}
+	}
+
+	bShowMouseCursor = true;
+	SetInputMode(FInputModeGameAndUI());
+
+	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
+	{
+		if (It->ActorHasTag(FName("LobbyCamera")))
+		{
+			SetViewTargetWithBlend(*It, 0.5f);
+			break;
+		}
+	}
+}
+
 void ALobbyPlayerController::ClientForceRotation_Implementation(FRotator NewRotation)
 {
 	SetControlRotation(NewRotation);
@@ -64,39 +97,6 @@ void ALobbyPlayerController::ServerChangeColor_Implementation(int32 ColorIndex)
 	if (APawn* MyPawn = GetPawn())
 		if (AZombieCharacter* ZC = Cast<AZombieCharacter>(MyPawn))
 			ZC->AssignMaterial(ColorIndex);
-}
-
-void ALobbyPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-
-	bAutoManageActiveCameraTarget = false;  
-
-	if (IsLocalController() && LobbyWidgetClass)
-	{
-		LobbyHUD = CreateWidget<ULobbyWidget>(this, LobbyWidgetClass);
-		if (LobbyHUD)
-		{
-			LobbyHUD->AddToViewport();
-			bIsHost = (GetWorld()->GetFirstPlayerController() == this);
-			int32 Required = 4;
-			if (ALobbyGameMode* GM = GetWorld()->GetAuthGameMode<ALobbyGameMode>())
-				Required = GM->MaxPlayers;
-			LobbyHUD->UpdatePlayerCount(1, Required);
-		}
-	}
-
-	bShowMouseCursor = true;
-	SetInputMode(FInputModeGameAndUI());
-
-	for (TActorIterator<ACameraActor> It(GetWorld()); It; ++It)
-	{
-		if (It->ActorHasTag(FName("LobbyCamera")))
-		{
-			SetViewTargetWithBlend(*It, 0.5f);
-			break;
-		}
-	}
 }
 
 void ALobbyPlayerController::ServerSetReady_Implementation()
