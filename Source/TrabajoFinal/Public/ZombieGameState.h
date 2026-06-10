@@ -24,7 +24,7 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Game")
 	float TimeRemaining = 120.f;
 
-	UPROPERTY(ReplicatedUsing = OnRep_GamePhase, BlueprintReadOnly, Category = "Game")
+    UPROPERTY(Replicated)
 	EGamePhase GamePhase = EGamePhase::Waiting;
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Game")
@@ -32,9 +32,6 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Game")
 	int32 ZombieCount = 0;
-
-	UFUNCTION()
-	void OnRep_GamePhase();
 
 	void SetGamePhase(EGamePhase NewPhase);
 	

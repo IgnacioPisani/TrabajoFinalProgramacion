@@ -13,15 +13,9 @@ void AZombieGameState::GetLifetimeReplicatedProps(
 	DOREPLIFETIME(AZombieGameState, ZombieCount);
 }
 
-void AZombieGameState::OnRep_GamePhase()
-{
-	UE_LOG(LogTemp, Warning, TEXT("GamePhase changed to: %d"), (int32)GamePhase);
-}
-
 void AZombieGameState::SetGamePhase(EGamePhase NewPhase)
 {
 	GamePhase = NewPhase;
-	OnRep_GamePhase();
 }
 
 void AZombieGameState::UpdateCounts(int32 Survivors, int32 Zombies)
